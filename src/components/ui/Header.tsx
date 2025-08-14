@@ -1,6 +1,7 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import React from "react";
-import { Button } from "./Button";
+import { MentorCard } from "./MentorCard";
+import { mentorData } from "../../utils/mentorData";
 
 interface HeaderProps {
   currentPersona: "hitesh" | "piyush";
@@ -22,39 +23,35 @@ export const Header: React.FC<HeaderProps> = ({
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.2 }}
-        className="flex flex-col items-center mb-4 sm:mb-6"
+        className="flex flex-col items-center mb-6 sm:mb-8"
       >
         <h1 className="text-3xl font-bold bg-gradient-to-r from-[#00ADB5] to-[#EEEEEE] bg-clip-text text-transparent">
           PersonaAI Chat
         </h1>
         <p className="text-[#EEEEEE]/60 mt-2">
-          Chat with your favorite tech mentors
+          Choose your tech mentor to start chatting
         </p>
       </motion.div>
 
-      <div className="flex gap-4">
-        <Button
-          variant={currentPersona === "hitesh" ? "primary" : "secondary"}
-          onClick={() => onPersonaChange("hitesh")}
-          size="lg"
-          isActive={currentPersona === "hitesh"}
-        >
-          <span className="flex items-center gap-2">
-            <span>☕️</span>
-            <span>Hitesh Choudhary</span>
-          </span>
-        </Button>
-        <Button
-          variant={currentPersona === "piyush" ? "primary" : "secondary"}
-          onClick={() => onPersonaChange("piyush")}
-          size="lg"
-          isActive={currentPersona === "piyush"}
-        >
-          <span className="flex items-center gap-2">
-            <span>🚀</span>
-            <span>Piyush Garg</span>
-          </span>
-        </Button>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-4xl">
+        <AnimatePresence mode="wait">
+          {Object.entries(mentorData).map(([id, mentor]) => (
+            <motion.div
+              key={id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              layout
+            >
+              <MentorCard
+                mentor={mentor}
+                isActive={currentPersona === id}
+                onClick={() => onPersonaChange(id as "hitesh" | "piyush")}
+              />
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
     </motion.div>
   );
