@@ -2,12 +2,30 @@ import { generatePrompt } from './personaData';
 
 const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
 
-export const getChatResponse = async (message: string, persona: 'hitesh' | 'piyush') => {
+type ModelType = 'gpt-3.5-turbo' | 'gpt-4' | 'gpt-4-turbo-preview';
+
+interface ChatOptions {
+  model?: ModelType;
+  temperature?: number;
+  maxTokens?: number;
+}
+
+export const getChatResponse = async (
+  message: string, 
+  persona: 'hitesh' | 'piyush',
+  options: ChatOptions = {}
+) => {
   const prompt = generatePrompt(persona, message);
   
   if (!apiKey || apiKey === 'your-actual-api-key-here') {
     throw new Error('Please add your OpenAI API key to the .env file');
   }
+
+  const {
+    model = 'gpt-3.5-turbo',
+    temperature = 0.9,
+    maxTokens = 500
+  } = options;
 
   try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -17,7 +35,7 @@ export const getChatResponse = async (message: string, persona: 'hitesh' | 'piyu
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: 'gpt-3.5-turbo',  // Changed to gpt-3.5-turbo as it's more widely available
+        model,
         messages: [
           {
             role: 'system',
@@ -28,8 +46,8 @@ export const getChatResponse = async (message: string, persona: 'hitesh' | 'piyu
             content: message
           }
         ],
-        temperature: 0.9,
-        max_tokens: 500,
+        temperature,
+        max_tokens: maxTokens,
         top_p: 1,
         frequency_penalty: 0.5,
         presence_penalty: 0.5

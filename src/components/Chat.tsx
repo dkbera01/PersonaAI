@@ -6,6 +6,9 @@ import { Input } from './ui/Input';
 import { Message } from './ui/Message';
 import { Header } from './ui/Header';
 import { LoadingIndicator } from './ui/LoadingIndicator';
+import { ModelSelector } from './ui/ModelSelector';
+
+type ModelType = 'gpt-3.5-turbo' | 'gpt-4' | 'gpt-4-turbo-preview';
 
 interface ChatMessage {
   content: string;
@@ -19,6 +22,7 @@ export const Chat: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [persona, setPersona] = useState<'hitesh' | 'piyush'>('hitesh');
+  const [model, setModel] = useState<ModelType>('gpt-3.5-turbo');
   const [isLoading, setIsLoading] = useState(false);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -70,7 +74,7 @@ export const Chat: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const response = await getChatResponse(input, persona);
+      const response = await getChatResponse(input, persona, { model });
       
       const assistantMessage: ChatMessage = {
         content: response,
@@ -140,6 +144,7 @@ export const Chat: React.FC = () => {
         className="p-6 bg-[#222831]/80 backdrop-blur border-t border-[#00ADB5]/30"
       >
         <div className="flex gap-4 max-w-4xl mx-auto">
+          <ModelSelector currentModel={model} onChange={setModel} />
           <Input
             type="text"
             value={input}
